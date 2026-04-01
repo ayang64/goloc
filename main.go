@@ -108,7 +108,7 @@ func expandPackages(pattern string) ([]string, error) {
 
 func findPackages(root string) ([]string, error) {
 	var packages []string
-	seen := make(map[string]bool)
+	seen := make(map[string]struct{})
 
 	err := filepath.WalkDir(root, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
@@ -133,9 +133,9 @@ func findPackages(root string) ([]string, error) {
 			if err != nil {
 				return err
 			}
-			if hasGoFiles && !seen[path] {
+			if _, exists := seen[path]; hasGoFiles && !exists {
 				packages = append(packages, path)
-				seen[path] = true
+				seen[path] = struct{}{}
 			}
 		}
 
@@ -238,8 +238,8 @@ func processFile(filePath string) (FileStats, error) {
 
 func countCodeLines(fset *token.FileSet, file *ast.File, totalLines int) int {
 	// Track which lines contain code or comments
-	codeLines := make(map[int]bool)
-	commentLines := make(map[int]bool)
+	codeLines := make(map[int]struct{})
+	commentLines := make(map[int]struct{})
 
 	// Mark all comment lines
 	for _, commentGroup := range file.Comments {
@@ -247,7 +247,7 @@ func countCodeLines(fset *token.FileSet, file *ast.File, totalLines int) int {
 			start := fset.Position(comment.Pos()).Line
 			end := fset.Position(comment.End()).Line
 			for line := start; line <= end; line++ {
-				commentLines[line] = true
+				commentLines[line] = struct{}{}
 			}
 		}
 	}
@@ -268,7 +268,7 @@ func countCodeLines(fset *token.FileSet, file *ast.File, totalLines int) int {
 			start := fset.Position(n.Pos()).Line
 			end := fset.Position(n.End()).Line
 			for line := start; line <= end; line++ {
-				codeLines[line] = true
+				codeLines[line] = struct{}{}
 			}
 		}
 
