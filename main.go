@@ -16,10 +16,10 @@ import (
 )
 
 type FileStats struct {
-	Name       string
-	Total      int
-	Blank      int
-	Code       int
+	Name  string
+	Total int
+	Blank int
+	Code  int
 }
 
 type PackageStats struct {
@@ -37,9 +37,7 @@ type ModuleStats struct {
 	CodeLines  int
 }
 
-var (
-	ignoreInternal bool
-)
+var ignoreInternal bool
 
 func main() {
 	includeTests := flag.Bool("t", false, "include test files (*_test.go)")
@@ -85,8 +83,7 @@ func main() {
 
 func isInternalPackage(pkgPath string) bool {
 	// Check if the path contains "internal" as a directory component
-	parts := strings.Split(filepath.Clean(pkgPath), string(filepath.Separator))
-	for _, part := range parts {
+	for _, part := range strings.Split(filepath.Clean(pkgPath), string(filepath.Separator)) {
 		if part == "internal" {
 			return true
 		}
@@ -144,7 +141,6 @@ func findPackages(root string) ([]string, error) {
 
 		return nil
 	})
-
 	if err != nil {
 		return nil, err
 	}
